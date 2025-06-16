@@ -1,0 +1,11 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        @* Moves focus to the first <h1> element when navigation occurs for accessibility *@
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <p>Page not found.</p>
+        <p>Sorry, there's nothing at this address.</p>
+    </NotFound>
+</Router>

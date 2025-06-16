@@ -1,0 +1,13 @@
+@using EventEase.Models
+
+<div class="event-card">
+    <h3>@Event?.Name</h3>
+    <p><strong>Date:</strong> @(Event != null ? Event.Date.ToShortDateString() : "N/A")</p>
+    <p><strong>Location:</strong> @Event?.Location</p>
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public EventModel Event { get; set; } = default!;
+}

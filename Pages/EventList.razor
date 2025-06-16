@@ -1,0 +1,22 @@
+@page "/events"
+@using EventEase.Models
+@using EventEase.Shared
+<h2>Upcoming Events</h2>
+
+@* TODO: Inject your event service here if implemented *@
+
+@code {
+    private List<EventModel> Events = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: Replace with your actual data fetching logic
+        Events = new List<EventModel>
+            {
+             new EventModel { Name = "Tech Conference 2025", Date = new DateTime(2025, 9, 1), Location = "New York" },
+        new EventModel { Name = "Startup Summit", Date = new DateTime(2025, 10, 15), Location = "San Francisco" },
+        new EventModel { Name = "AI Expo", Date = new DateTime(2025, 11, 5), Location = "Chicago" }
+            };
+        await Task.CompletedTask;
+    }
+}
