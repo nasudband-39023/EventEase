@@ -1,0 +1,51 @@
+﻿@page "/weather"
+@using EventEaseProject.Services
+@using EventEaseProject.Models
+@inject WeatherService WeatherService
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather in 3 Cities</h1>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color: red;"><b>@errorMessage</b></p>
+}
+else if (weatherList == null || !weatherList.Any())
+{
+    <p><em>Loading weather data...</em></p>
+}
+else
+{
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+        @foreach (var weather in weatherList)
+        {
+            <div style="border: 1px solid #ccc; border-radius: 10px; padding: 1rem; width: 250px;">
+                <h3>@weather.name</h3>
+                <p>@weather.weather[0].description</p>
+                <p>Temp: @weather.main.temp °C</p>
+                <p>Humidity: @weather.main.humidity%</p>
+                <img src="@($"https://openweathermap.org/img/wn/{weather.weather[0].icon}@2x.png")" alt="Weather icon" />
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<WeatherModel> weatherList = new();
+    private string? errorMessage;
+
+    private readonly List<string> cities = new() { "Seattle", "Central Park", "San Francisco" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            weatherList = await WeatherService.GetWeatherForCitiesAsync(cities);
+        }
+        catch (Exception)
+        {
+            errorMessage = "Failed to load weather data. Please try again later.";
+        }
+    }
+}

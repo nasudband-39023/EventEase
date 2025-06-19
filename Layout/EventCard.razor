@@ -1,0 +1,19 @@
+@using EventEaseProject.Models
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">@(string.IsNullOrEmpty(Event.Name) ? "Unnamed Event" : Event.Name)</h5>
+        <p class="card-text">
+            <strong>Date:</strong> @(Event.Date == default ? "TBD" : Event.Date.ToShortDateString())<br />
+            <strong>Location:</strong> @(string.IsNullOrEmpty(Event.Location) ? "Location not specified" : Event.Location)
+        </p>
+        <NavLink class="btn btn-primary" href="@($"event/{Event.Id}")">
+            See more
+        </NavLink>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventEaseProject.Models.Event Event { get; set; } = new EventEaseProject.Models.Event();
+}

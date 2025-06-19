@@ -1,0 +1,89 @@
+@page "/attendance/{EventId:int}"
+@using EventEaseProject.Models
+@using EventEaseProject.Services
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-4">
+    @if (currentEvent != null)
+    {
+        <h2>Attendance for @currentEvent.Name</h2>
+        <div class="row mt-4">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Registered People</h5>
+                        
+                        @if (registrations.Any())
+                        {
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var registration in registrations)
+                                    {
+                                        <tr>
+                                            <td>@registration.FirstName @registration.LastName</td>
+                                            <td>@registration.Email</td>
+                                            <td>@registration.PhoneNumber</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            
+                            <p><strong>Total Registrations:</strong> @registrations.Count</p>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                No registrations for this event yet.
+                            </div>
+                        }
+                        
+                        <button class="btn btn-secondary" @onclick="GoToEventDetails">Back to Event</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <h4>Event not found</h4>
+            <p>Sorry, we couldn't find an event with ID @EventId.</p>
+            <button class="btn btn-secondary" @onclick="GoToEvents">Back to Events</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? currentEvent;
+    private List<RegistrationModel> registrations = new();
+
+    protected override void OnInitialized()
+    {
+        currentEvent = EventService.GetEventById(EventId);
+        if (currentEvent != null)
+        {
+            registrations = SessionState.GetRegistrationsForEvent(EventId);
+        }
+    }
+
+    private void GoToEventDetails()
+    {
+        NavigationManager.NavigateTo($"/event/{EventId}");
+    }
+
+    private void GoToEvents()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

@@ -1,0 +1,82 @@
+@page "/event/{Id:int}"
+@using EventEaseProject.Models
+@using EventEaseProject.Services
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-4">
+    @if (currentEvent != null)
+    {
+        <h2>@currentEvent.Name</h2>
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Details</h5>
+                        <p><strong>Date:</strong> @currentEvent.Date.ToLongDateString()</p>
+                        <p><strong>Where:</strong> @currentEvent.Location</p>
+                        <p><strong>Description:</strong> @currentEvent.Description</p>
+                        <p><strong>Total registered participants:</strong> @registrationCount</p>
+                        
+                        <div class="mt-3">
+                                <NavLink class="btn btn-success" href="@($"register/{currentEvent.Id}")">
+                                    Enter Now!
+                                </NavLink>
+                                <NavLink class="btn btn-info mx-2" href="@($"attendance/{currentEvent.Id}")">
+                                    View People
+                                </NavLink>
+                            <button class="btn btn-secondary" @onclick="GoBack">Back to Events</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <h4>Event not found</h4>
+            <p>Sorry, we couldn't find an event with ID @Id.</p>
+            <button class="btn btn-secondary" @onclick="GoBack">Back to Events</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Event? currentEvent;
+    private int registrationCount = 0;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            currentEvent = EventService.GetEventById(Id);
+            if (currentEvent != null)
+            {
+                // Check if SessionState is available
+                try 
+                {
+                    registrationCount = SessionState.GetRegistrationCountForEvent(Id);
+                }
+                catch (Exception)
+                {
+                    // If there's an issue with SessionState, just default to 0
+                    registrationCount = 0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in EventDetails: {ex.Message}");
+            currentEvent = null;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

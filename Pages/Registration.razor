@@ -1,0 +1,111 @@
+@page "/register/{EventId:int}"
+@using EventEaseProject.Models
+@using EventEaseProject.Services
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-4">
+    @if (currentEvent != null)
+    {
+        <h2>Registering for @currentEvent.Name</h2>
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Register yourself here</h5>
+                        <p>Register to this event on @currentEvent.Date.ToShortDateString() at @currentEvent.Location.</p>
+                        
+                        @if (!showSuccessMessage)
+                        {
+                            <EditForm Model="@registrationModel" OnValidSubmit="@HandleValidSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                
+                                <div class="form-group mb-3">
+                                    <label for="firstName">Name</label>
+                                    <InputText id="firstName" @bind-Value="registrationModel.FirstName" class="form-control" />
+                                    <ValidationMessage For="@(() => registrationModel.FirstName)" />
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="lastName">Surname</label>
+                                    <InputText id="lastName" @bind-Value="registrationModel.LastName" class="form-control" />
+                                    <ValidationMessage For="@(() => registrationModel.LastName)" />
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="email">E-mail</label>
+                                    <InputText id="email" @bind-Value="registrationModel.Email" class="form-control" />
+                                    <ValidationMessage For="@(() => registrationModel.Email)" />
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="phone">Your Phone Number</label>
+                                    <InputText id="phone" @bind-Value="registrationModel.PhoneNumber" class="form-control" />
+                                    <ValidationMessage For="@(() => registrationModel.PhoneNumber)" />
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Register</button>
+                                <button type="button" class="btn btn-secondary ml-2" @onclick="GoBack">Cancel</button>
+                            </EditForm>
+                        }
+                        
+                        @if (showSuccessMessage)
+                        {
+                            <div class="alert alert-success mt-3">
+                                <h5>Success!</h5>
+                                <p>You have been registered for @currentEvent.Name.</p>
+                                <button class="btn btn-primary" @onclick="GoToEvents">Return to Events</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <h4>Event not found</h4>
+            <p>Sorry, we couldn't find an event with ID @EventId.</p>
+            <button class="btn btn-secondary" @onclick="GoToEvents">Back to Events</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? currentEvent;
+    private RegistrationModel registrationModel = new RegistrationModel();
+    private bool showSuccessMessage = false;
+
+    protected override void OnInitialized()
+    {
+        currentEvent = EventService.GetEventById(EventId);
+        if (currentEvent != null)
+        {
+            registrationModel.EventId = currentEvent.Id;
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        //Succes Message
+        showSuccessMessage = true;
+        
+        // Add to session tracker
+        SessionState.RegisterForEvent(currentEvent!.Id, registrationModel);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo($"/event/{EventId}");
+    }
+
+    private void GoToEvents()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

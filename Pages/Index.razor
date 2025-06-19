@@ -1,0 +1,39 @@
+﻿@page "/"
+@using EventEaseProject.Models
+@using EventEaseProject.Services
+@using EventEaseProject.Layout
+@inject EventService EventService
+
+<div class="container mt-4">
+    <div class="jumbotron bg-light p-4 mb-4 rounded">
+        <h1>EventEase</h1>
+        <p class="lead">Hope you enjoy our events!.</p>
+    </div>
+
+    <h3>Choose one</h3>
+
+    @if (!events.Any())
+    {
+        <div class="alert alert-info">No events are currently available.</div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var eventItem in events)
+            {
+                <div class="col-md-4">
+                    <EventCard Event="eventItem" />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Event> events = new List<Event>();
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetEvents();
+    }
+}
