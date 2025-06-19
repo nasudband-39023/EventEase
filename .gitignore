@@ -1,14 +1,4 @@
+.vs/
 bin/
 obj/
-*.user
-*.suo
-*.vs/
-.vscode/
-*.log
-*.zip
-*.exe
-*.dll
-*.pdb
-*.db
-*.cache
-node_modules/
+Properties/launchSettings.json

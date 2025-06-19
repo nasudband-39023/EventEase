@@ -1,0 +1,48 @@
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<EditForm Model="registrationModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="registrationModel.Name" />
+        <ValidationMessage For="@(() => registrationModel.Name)" />
+    </div>
+
+    <div>
+        <label>Email:</label>
+        <InputText @bind-Value="registrationModel.Email" />
+        <ValidationMessage For="@(() => registrationModel.Email)" />
+    </div>
+
+    <button type="submit">Registrarse</button>
+</EditForm>
+
+@if (successMessage != null)
+{
+    <p>@successMessage</p>
+}
+
+@code {
+    private RegistrationModel registrationModel = new();
+    private string? successMessage;
+
+    private void HandleValidSubmit()
+    {
+        // Calling service to save user.
+        successMessage = $"Gracias por registrarte, {registrationModel.Name}!";
+        // Redirect o reset form
+    }
+
+    public class RegistrationModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "El email es obligatorio")]
+        [EmailAddress(ErrorMessage = "Email inválido")]
+        public string? Email { get; set; }
+    }
+}

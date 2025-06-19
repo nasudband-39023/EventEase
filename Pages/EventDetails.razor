@@ -1,3 +1,38 @@
 @page "/eventdetails"
 <h3>Event Details Page</h3>
 <p>This is where detailed info about the selected event will go.</p>
+@inject UserSessionService UserSession
+@inject EventAttendanceService AttendanceService
+
+<button @onclick="MarkAttendance" disabled="@(!UserSession.IsLoggedIn)">
+    Asistir a este evento
+</button>
+
+<p>Asistentes:</p>
+<ul>
+    @foreach (var attendee in attendees)
+    {
+        <li>@attendee</li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private List<string> attendees = new();
+
+    protected override void OnInitialized()
+    {
+        attendees = AttendanceService.GetAttendees(EventId);
+    }
+
+    private void MarkAttendance()
+    {
+        if (UserSession.IsLoggedIn && UserSession.UserName != null)
+        {
+            AttendanceService.RegisterAttendance(EventId, UserSession.UserName);
+            attendees = AttendanceService.GetAttendees(EventId);
+        }
+    }
+}
